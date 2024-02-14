@@ -22,6 +22,7 @@ class Item(db.Model):
     name = db.Column(db.String(100))
     description = db.Column(db.String(255))
     availability = db.Column(db.Boolean, default=True)
+    inventory_id = db.Column(db.Integer, db.ForeignKey('inventory.id'))
 
 class BorrowingHistory(db.Model):
     __tablename__ = 'borrowing_history'
@@ -29,3 +30,9 @@ class BorrowingHistory(db.Model):
     borrower_id = db.Column(db.Integer)
     item_id = db.Column(db.Integer, db.ForeignKey('items.id'))
     returned = db.Column(db.Boolean, default=False)
+
+class Inventory(db.Model):
+    __tablename__ = 'inventory'
+    id = db.Column(db.Integer, primary_key=True)
+    item_id = db.Column(db.Integer, db.ForeignKey('items.id'))
+    quantity = db.Column(db.Integer, default=0)
