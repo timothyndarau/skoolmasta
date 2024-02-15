@@ -1,56 +1,8 @@
 // login.js
+import React from 'react';
 
-document.addEventListener("DOMContentLoaded", function () {
-    // Step 1: Add event listeners to toggle between login and create account forms
-    let login = document.querySelector(".login");
-    let create = document.querySelector(".create");
-    let container = document.querySelector(".container");
-  
-    login.onclick = function () {
-      container.classList.add("signinForm");
-    };
-  
-    create.onclick = function () {
-      container.classList.remove("signinForm");
-    };
-  
-    // Step 2: Form validation for sign-up
-    function validateSignupForm() {
-      let password = document.querySelector(".signup-password").value;
-      let confirmPassword = document.querySelector(".confirm-password").value;
-  
-      if (password !== confirmPassword) {
-        alert("Passwords do not match!");
-        return false;
-      }
-      return true;
-    }
-  
-    // Step 3: Form validation for login
-    function validateLoginForm() {
-      let username = document.querySelector(".login-username").value;
-      let password = document.querySelector(".login-password").value;
-  
-      // Perform any additional validation if needed
-  
-      return true;
-    }
-  
-    // Step 4: Add event listeners for form submissions
-    document.querySelector(".signup-form").addEventListener("submit", function (event) {
-      if (!validateSignupForm()) {
-        event.preventDefault(); // Prevent form submission if validation fails
-      }
-    });
-  
-    document.querySelector(".login-form").addEventListener("submit", function (event) {
-      if (!validateLoginForm()) {
-        event.preventDefault(); // Prevent form submission if validation fails
-      }
-    });
-  
-    // Step 5: Append the provided HTML code to the document's body
-    document.body.innerHTML += 
+function Login() {
+  return (
       <div class="container">
         <div class="form signup">
           <h2>Sign Up</h2>
@@ -98,6 +50,6 @@ document.addEventListener("DOMContentLoaded", function () {
           <p>Not Registered ? <a href="#" class="create">Create an account</a></p>
         </div>
       </div>
-    ;
-  });
-  
+    );
+}
+export default Login;

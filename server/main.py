@@ -1,10 +1,9 @@
-from flask import  Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
 
 app = Flask(__name__)
-
 app.config['SECRET_KEY'] = 'your_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 db = SQLAlchemy(app)
@@ -16,14 +15,6 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))
     is_admin = db.Column(db.Boolean, default=False)
-
-# Define Item model
-class Item(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100))
-    description = db.Column(db.String(200))
-    borrower_id = db.Column(db.Integer)
-    availability = db.Column(db.Boolean, default=True)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -53,18 +44,21 @@ def logout():
 def admin_dashboard():
     if not current_user.is_admin:
         return redirect(url_for('login'))
-    items = Item.query.all()
-    return render_template('admin_dashboard.html', items=items)
+    return render_template('index.html')
 
 @app.route('/admin/attempts')
 @login_required
 def attempted_borrows():
     if not current_user.is_admin:
         return redirect(url_for('login'))
-    attempted_borrows = Item.query.filter_by(availability=False).all()
-    return render_template('attempted_borrows.html', attempted_borrows=attempted_borrows)
+    return render_template('index.html')
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template('404.html'), 404
 
-
+@app.errorhandler(500)
+def internal_server_error(error):
+    return render_template('500.html'), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
