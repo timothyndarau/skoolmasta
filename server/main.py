@@ -1,12 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-
+from models import db  # Import only the db instance from models
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
-db = SQLAlchemy(app)
+db.init_app(app)  # Initialize the db instance with the Flask app
 login_manager = LoginManager(app)
 
 # Define User model for authentication
@@ -22,6 +22,7 @@ def load_user(user_id):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    from models import Item  # Import Item here if needed
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -42,6 +43,7 @@ def logout():
 @app.route('/admin/dashboard')
 @login_required
 def admin_dashboard():
+    from models import Item  # Import Item here if needed
     if not current_user.is_admin:
         return redirect(url_for('login'))
     return render_template('index.html')
@@ -49,16 +51,10 @@ def admin_dashboard():
 @app.route('/admin/attempts')
 @login_required
 def attempted_borrows():
+    from models import Item  # Import Item here if needed
     if not current_user.is_admin:
         return redirect(url_for('login'))
     return render_template('index.html')
-@app.errorhandler(404)
-def page_not_found(error):
-    return render_template('404.html'), 404
-
-@app.errorhandler(500)
-def internal_server_error(error):
-    return render_template('500.html'), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

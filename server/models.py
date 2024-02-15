@@ -1,7 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from sqlalchemy.orm import relationship
-from models import Item
+#from models import 
 
 
 db = SQLAlchemy()
