@@ -1,12 +1,14 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-from models import db  # Import only the db instance from models
+from models import db, Item, Teacher, Student, Inventory, BorrowingHistory  # Import all models
+from werkzeug.security import generate_password_hash, check_password_hash
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
-db.init_app(app)  # Initialize the db instance with the Flask app
+db.init_app(app) 
 login_manager = LoginManager(app)
 
 # Define User model for authentication
@@ -22,17 +24,18 @@ def load_user(user_id):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    from models import Item  # Import Item here if needed
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
         user = User.query.filter_by(username=username).first()
-        if user and user.password == password:
+        if user and check_password_hash(user.password, password):
             login_user(user)
             return redirect(url_for('admin_dashboard'))
         else:
             flash('Invalid username or password', 'error')
+            return redirect(url_for('login'))
     return render_template('login.html')
+
 
 @app.route('/logout')
 @login_required
@@ -46,6 +49,26 @@ def admin_dashboard():
     from models import Item  # Import Item here if needed
     if not current_user.is_admin:
         return redirect(url_for('login'))
+    
+    # Deleting a specific student by ID
+    student = Student.query.get(1)
+    db.session.delete(student)
+    db.session.commit()
+    
+    # Fetching a specific teacher by ID and updating their subject
+    teacher = Teacher.query.get(1)
+    teacher.subject = "Math"
+    db.session.commit()
+    
+    # Querying all teachers
+    teacher = Teacher.query.all()
+
+    # Querying all students
+    student = Student.query.all()
+
+    # Querying all items
+    Item = Item.query.all()
+    
     return render_template('index.html')
 
 @app.route('/admin/attempts')
@@ -54,7 +77,33 @@ def attempted_borrows():
     from models import Item  # Import Item here if needed
     if not current_user.is_admin:
         return redirect(url_for('login'))
-    return render_template('index.html')
+    
+    # Deleting a specific student by ID
+    student = Student.query.get(1)
+    db.session.delete(student)
+    db.session.commit()
+    
+    # Fetching a specific teacher by ID and updating their subject
+    teacher = Teacher.query.get(1)
+    teacher.subject = "Math"
+    db.session.commit()
+    
+    # Querying all teachers
+    teacher = Teacher.query.all()
+
+    # Querying all students
+    student = Student.query.all()
+
+    # Querying all items
+    Item = Item.query.all()
+    attempted_borrows = BorrowingHistory.query.all()
+    
+    return render_template('index.html', attempted_borrows=attempted_borrows)
 
 if __name__ == '__main__':
+    # Create the database tables
+    with app.app_context():
+        db.create_all()
+
+    # Run the Flask application
     app.run(debug=True)

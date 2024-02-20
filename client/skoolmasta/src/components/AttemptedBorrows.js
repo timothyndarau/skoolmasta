@@ -1,34 +1,29 @@
-// AttemptedBorrows.js
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 
 const AttemptedBorrows = () => {
+  // State to store the attempted borrows data
   const [attemptedBorrows, setAttemptedBorrows] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchAttemptedBorrows = async () => {
-      try {
-        const response = await axios.get('/api/attempted-borrows');
-        setAttemptedBorrows(response.data);
-        setLoading(false);
-      } catch (error) {
-        setError('Error fetching attempted borrows');
-        setLoading(false);
-      }
-    };
-
-    fetchAttemptedBorrows();
-  }, []);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+    // Fetch attempted borrows data from the backend
+    fetch('/admin/attempts', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        // Include credentials if necessary
+        // credentials: 'include',
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        // Set the attempted borrows data in the state
+        setAttemptedBorrows(data);
+      })
+      .catch(error => {
+        // Handle any errors
+        console.error('Error fetching attempted borrows:', error);
+      });
+  }, []); // Empty dependency array ensures the effect runs only once on component mount
 
   return (
     <div>
